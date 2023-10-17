@@ -88,5 +88,9 @@ function restartGameHandler() {
   currentScore = 0;
   gameScoreCounter.textContent = currentScore.toString();
   board.reset();
-  gameLoop?.start();
+  currentTetromino = new Tetromino();
+  accumulatedUpdateTime = 0;
+  accumulatedRotationTime = 0;
+  accumulatedMoveTime = 0;
+  gameLoop = new GameLoop(update);
 }
