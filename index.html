@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en" class="h-fill-available">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Tetris</title>
+  </head>
+  <body class="grid h-full place-items-center bg-gray-900 text-white">
+    <div id="gameScoreCounter">0</div>
+    <canvas class="bg-gray-800"></canvas>
+    <div
+      id="mainMenu"
+      class="fixed w-full max-w-xs rounded-sm border border-gray-600 bg-gray-700 p-4 text-center shadow-md"
+    >
+      <h2 class="mb-8 text-4xl font-bold">Tetris</h2>
+      <button id="playButton">play</button>
+    </div>
+    <div
+      id="endGameMenu"
+      class="fixed hidden w-full max-w-xs rounded-sm border border-gray-600 bg-gray-700 p-4 text-center shadow-md"
+    >
+      <h2 class="mb-8 text-4xl font-bold">You lose</h2>
+      <p>score : <span id="endGameScoreCounter"></span></p>
+      <button id="playAgainButton">play again</button>
+    </div>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>
