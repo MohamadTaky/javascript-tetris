@@ -1,6 +1,6 @@
 export const ROWS = 20;
 export const COLS = 10;
-export const BLOCK_SIZE = 22;
+export const BLOCK_SIZE = 28;
 export const PADDING = 1;
 export const WIDTH = COLS * BLOCK_SIZE + PADDING * 2;
 export const HEIGHT = ROWS * BLOCK_SIZE + PADDING * 2;

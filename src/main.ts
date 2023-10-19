@@ -21,7 +21,7 @@ let currentScore = new CurrentScore();
 let mainMenu = new MainMenu();
 let endGameMenu = new EndGameMenu();
 
-let updateRate = 500;
+let updateRate = 450;
 let accumulatedUpdateTime = 0;
 function update(deltaTime: number) {
   accumulatedUpdateTime += deltaTime;
@@ -44,11 +44,11 @@ function update(deltaTime: number) {
   currentTetromino.draw(ctx, board.matrix);
 }
 
-inputHandler.inputEvents.get("moveLeft")?.addCallback(() => currentTetromino.moveLeft(board.matrix));
-inputHandler.inputEvents.get("moveRight")?.addCallback(() => currentTetromino.moveRight(board.matrix));
-inputHandler.inputEvents.get("moveDown")?.addCallback(() => currentTetromino.moveDown(board.matrix));
-inputHandler.inputEvents.get("rotateLeft")?.addCallback(() => currentTetromino.rotateLeft(board.matrix));
-inputHandler.inputEvents.get("rotateRight")?.addCallback(() => currentTetromino.rotateRight(board.matrix));
+inputHandler.inputEvents.moveLeft.addCallback(() => currentTetromino.moveLeft(board.matrix));
+inputHandler.inputEvents.moveRight.addCallback(() => currentTetromino.moveRight(board.matrix));
+inputHandler.inputEvents.moveDown.addCallback(() => currentTetromino.moveDown(board.matrix));
+inputHandler.inputEvents.rotateLeft.addCallback(() => currentTetromino.rotateLeft(board.matrix));
+inputHandler.inputEvents.rotateRight.addCallback(() => currentTetromino.rotateRight(board.matrix));
 
 function initGameStates() {
   endGameMenu.menu.classList.add("hidden");
