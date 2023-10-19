@@ -3,8 +3,6 @@ import Event from "./Event";
 export default class InputHandler {
   touchStart = { x: 0, y: 0 };
   touchDrag = { x: 0, y: 0 };
-  dirX = 0;
-  dirY = 0;
   inputRate = 100;
   rotationDir = 0;
   moveDownEvent = new Event();
@@ -77,25 +75,24 @@ export default class InputHandler {
     const absDeltaY = Math.abs(deltaY);
 
     if (absDeltaX > 20) {
-      this.dirX = deltaX / absDeltaX;
+      if (deltaX > 0) this.inputEvents.get("moveRight")?.fire();
+      else this.inputEvents.get("moveLeft")?.fire();
       this.touchDrag.x = event.touches[0].pageX;
     }
     if (absDeltaY > 20) {
-      this.dirY = deltaY / absDeltaY;
+      if (deltaY > 0) this.inputEvents.get("moveDown")?.fire();
       this.touchDrag.y = event.touches[0].pageY;
     }
   };
-  
+
   handleTouchEnd = (event: TouchEvent) => {
     if (!event.changedTouches) return;
     const deltaX = event.changedTouches[0].pageX - this.touchStart.x;
     const deltaY = event.changedTouches[0].pageX - this.touchStart.x;
     if (Math.hypot(deltaX, deltaY) < 10) {
       const touchRelativeToScrrenCenter = event.changedTouches[0].pageX - document.body.clientWidth * 0.5;
-      if (touchRelativeToScrrenCenter > 0) this.rotateRightEvent.fire();
-      else this.rotateLeftEvent.fire();
+      if (touchRelativeToScrrenCenter > 0) this.inputEvents.get("rotateRight")?.fire();
+      else this.inputEvents.get("rotateLeft")?.fire();
     }
-    this.dirX = 0;
-    this.dirY = 0;
   };
 }
