@@ -8,10 +8,6 @@ export default class InputHandler {
   moveDownEvent = new Event();
   inputEvents: Map<string, Event> = new Map();
   inputIntervals: Map<string, number> = new Map();
-  moveLeftEvent = new Event();
-  moveRightEvent = new Event();
-  rotateLeftEvent = new Event();
-  rotateRightEvent = new Event();
 
   constructor() {
     document.addEventListener("keydown", this.handleInput);
