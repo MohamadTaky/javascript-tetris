@@ -59,11 +59,13 @@ export default class InputHandler {
   };
 
   handleTouchStart = (event: TouchEvent) => {
+    event.preventDefault();
     if (!event.touches) return;
     this.touchStart.x = event.touches[0].pageX;
     this.touchStart.y = event.touches[0].pageY;
   };
   handleTouchMove = (event: TouchEvent) => {
+    event.preventDefault();
     if (!event.touches) return;
     const deltaX = event.touches[0].pageX - this.touchDrag.x;
     const deltaY = event.touches[0].pageY - this.touchDrag.y;
@@ -82,6 +84,7 @@ export default class InputHandler {
   };
 
   handleTouchEnd = (event: TouchEvent) => {
+    event.preventDefault();
     if (!event.changedTouches) return;
     const deltaX = event.changedTouches[0].pageX - this.touchStart.x;
     const deltaY = event.changedTouches[0].pageX - this.touchStart.x;
