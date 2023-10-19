@@ -21,7 +21,7 @@ let currentScore = new CurrentScore();
 let mainMenu = new MainMenu();
 let endGameMenu = new EndGameMenu();
 
-let updateRate = 450;
+let updateRate = 550;
 let accumulatedUpdateTime = 0;
 function update(deltaTime: number) {
   accumulatedUpdateTime += deltaTime;
