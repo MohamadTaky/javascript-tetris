@@ -1,9 +1,12 @@
 import Board from "@/classes/Board";
+import CurrentScore from "@/classes/CurrentScore";
+import EndGameMenu from "@/classes/EndGameMenu";
 import GameLoop from "@/classes/GameLoop";
+import MainMenu from "@/classes/MainMenu";
 import Tetromino from "@/classes/Tetromino";
 import "@/style.css";
 import InputHandler from "./classes/InputHandler";
-import { HEIGHT, SCORE_TABLE, WIDTH } from "./constants";
+import { HEIGHT, SCORE_TABLE, WIDTH } from "@/constants";
 
 const canvas = document.querySelector("canvas")!;
 const ctx = canvas.getContext("2d")!;
@@ -14,83 +17,48 @@ let gameLoop: GameLoop | null = null;
 const inputHandler = new InputHandler();
 const board = new Board();
 let currentTetromino = new Tetromino();
+let currentScore = new CurrentScore();
+let mainMenu = new MainMenu();
+let endGameMenu = new EndGameMenu();
 
-let currentScore = 0;
-let gameScoreCounter = document.getElementById("gameScoreCounter")!;
-
-let mainMenu = document.getElementById("mainMenu")!;
-let playButton = document.getElementById("playButton")!;
-playButton.addEventListener("click", startGameHandler);
-
-let endGameMenu = document.getElementById("endGameMenu")!;
-let playAgainButton = document.getElementById("playAgainButton")!;
-let endGameScoreCounter = document.getElementById("endGameScoreCounter")!;
-playAgainButton.addEventListener("click", restartGameHandler);
-
-function clearedRowsHandler(clearedRows: keyof typeof SCORE_TABLE) {
-  currentScore += SCORE_TABLE[clearedRows];
-  gameScoreCounter.textContent = currentScore.toString();
-}
-
-let rotationRate = 70;
-let accumulatedRotationTime = 0;
-let moveRate = 100;
-let accumulatedMoveTime = 0;
 let updateRate = 500;
 let accumulatedUpdateTime = 0;
 function update(deltaTime: number) {
   accumulatedUpdateTime += deltaTime;
   while (accumulatedUpdateTime > updateRate) {
     accumulatedUpdateTime -= updateRate;
-    if (currentTetromino.checkCollission(board.matrix, 0, 0)) endGameHandler();
+    if (currentTetromino.checkCollission(board.matrix, 0, 0)) {
+      gameLoop?.stop();
+      endGameMenu.scoreCounter.textContent = currentScore.score.toString();
+      endGameMenu.menu.classList.remove("hidden");
+    }
     if (currentTetromino.checkCollission(board.matrix, 1, 0)) {
       board.apply(currentTetromino);
       const clearedRows = board.clearFullRows() as keyof typeof SCORE_TABLE;
-      if (clearedRows) clearedRowsHandler(clearedRows);
+      if (clearedRows) currentScore.addScore(SCORE_TABLE[clearedRows]);
       currentTetromino = new Tetromino();
     } else currentTetromino.moveDown(board.matrix);
   }
 
-  accumulatedMoveTime += deltaTime;
-  while (accumulatedMoveTime > moveRate) {
-    accumulatedMoveTime -= moveRate;
-    if (inputHandler.left) currentTetromino.moveLeft(board.matrix);
-    if (inputHandler.right) currentTetromino.moveRight(board.matrix);
-    if (inputHandler.down) currentTetromino.moveDown(board.matrix);
-  }
-
-  accumulatedRotationTime += deltaTime;
-  while (accumulatedRotationTime > rotationRate) {
-    accumulatedRotationTime -= rotationRate;
-    if (inputHandler.rotateLeft) currentTetromino.rotateLeft(board.matrix);
-    if (inputHandler.rotateRight) currentTetromino.rotateRight(board.matrix);
-  }
-
   board.draw(ctx);
-  currentTetromino.draw(ctx);
+  currentTetromino.draw(ctx, board.matrix);
 }
 
-function endGameHandler() {
-  gameLoop?.stop();
-  endGameScoreCounter.textContent = currentScore.toString();
-  endGameMenu.classList.remove("hidden");
-}
+inputHandler.inputEvents.get("moveLeft")?.addCallback(() => currentTetromino.moveLeft(board.matrix));
+inputHandler.inputEvents.get("moveRight")?.addCallback(() => currentTetromino.moveRight(board.matrix));
+inputHandler.inputEvents.get("moveDown")?.addCallback(() => currentTetromino.moveDown(board.matrix));
+inputHandler.inputEvents.get("rotateLeft")?.addCallback(() => currentTetromino.rotateLeft(board.matrix));
+inputHandler.inputEvents.get("rotateRight")?.addCallback(() => currentTetromino.rotateRight(board.matrix));
 
-function startGameHandler() {
-  mainMenu.classList.add("hidden");
-  currentScore = 0;
-  gameScoreCounter.textContent = currentScore.toString();
-  gameLoop = new GameLoop(update);
-}
-
-function restartGameHandler() {
-  endGameMenu.classList.add("hidden");
-  currentScore = 0;
-  gameScoreCounter.textContent = currentScore.toString();
-  board.reset();
-  currentTetromino = new Tetromino();
+function initGameStates() {
+  endGameMenu.menu.classList.add("hidden");
+  mainMenu.menu.classList.add("hidden");
+  currentScore.reset();
   accumulatedUpdateTime = 0;
-  accumulatedRotationTime = 0;
-  accumulatedMoveTime = 0;
+  currentTetromino = new Tetromino();
+  board.reset();
   gameLoop = new GameLoop(update);
 }
+
+mainMenu.playEvent.addCallback(initGameStates);
+endGameMenu.playAgainEvent.addCallback(initGameStates);
