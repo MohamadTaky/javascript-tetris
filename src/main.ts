@@ -44,11 +44,11 @@ function update(deltaTime: number) {
   currentTetromino.draw(ctx, board.matrix);
 }
 
-inputHandler.inputEvents.moveLeft.addCallback(() => currentTetromino.moveLeft(board.matrix));
-inputHandler.inputEvents.moveRight.addCallback(() => currentTetromino.moveRight(board.matrix));
-inputHandler.inputEvents.moveDown.addCallback(() => currentTetromino.moveDown(board.matrix));
-inputHandler.inputEvents.rotateLeft.addCallback(() => currentTetromino.rotateLeft(board.matrix));
-inputHandler.inputEvents.rotateRight.addCallback(() => currentTetromino.rotateRight(board.matrix));
+inputHandler.events.moveLeft.addCallback(() => currentTetromino.moveLeft(board.matrix));
+inputHandler.events.moveRight.addCallback(() => currentTetromino.moveRight(board.matrix));
+inputHandler.events.moveDown.addCallback(() => currentTetromino.moveDown(board.matrix));
+inputHandler.events.rotateLeft.addCallback(() => currentTetromino.rotateLeft(board.matrix));
+inputHandler.events.rotateRight.addCallback(() => currentTetromino.rotateRight(board.matrix));
 
 function initGameStates() {
   endGameMenu.menu.classList.add("hidden");

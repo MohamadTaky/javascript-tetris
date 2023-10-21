@@ -4,28 +4,24 @@ export default class InputHandler {
   touchStart = { x: 0, y: 0 };
   touchDrag = { x: 0, y: 0 };
   inputRate = 70;
-  moveDownEvent = new Event();
-  inputEvents = {
+  keys = {
+    rotateLeft: false,
+    rotateRight: false,
+  };
+  events = {
     moveLeft: new Event(),
     moveRight: new Event(),
     moveDown: new Event(),
     rotateLeft: new Event(),
     rotateRight: new Event(),
   };
-  inputIntervals: {
-    moveLeft: undefined | number;
-    moveRight: undefined | number;
-    moveDown: undefined | number;
-    rotateLeft: undefined | number;
-    rotateRight: undefined | number;
-  } = {
-    moveLeft: undefined,
-    moveRight: undefined,
-    moveDown: undefined,
-    rotateLeft: undefined,
-    rotateRight: undefined,
+  intervals = {
+    moveLeft: 0,
+    moveRight: 0,
+    moveDown: 0,
+    rotateLeft: 0,
+    rotateRight: 0,
   };
-
   constructor() {
     document.addEventListener("keydown", this.handleInput);
     document.addEventListener("keyup", this.handleInput);
@@ -33,7 +29,6 @@ export default class InputHandler {
     document.addEventListener("touchmove", this.handleTouchMove);
     document.addEventListener("touchend", this.handleTouchEnd);
   }
-
   handleInput = (event: KeyboardEvent) => {
     switch (event.code) {
       case "KeyA":
@@ -49,24 +44,28 @@ export default class InputHandler {
         this.handleKey(event, "moveDown");
         break;
       case "KeyQ":
-        this.handleKey(event, "rotateLeft");
+        this.handleSingleKey(event, "rotateRight");
         break;
       case "KeyE":
-        this.handleKey(event, "rotateRight");
+        this.handleSingleKey(event, "rotateLeft");
         break;
     }
   };
-
-  handleKey = (event: KeyboardEvent, code: keyof typeof this.inputEvents) => {
-    if (event.type === "keydown" && !this.inputIntervals[code]) {
-      this.inputEvents[code].fire();
-      this.inputIntervals[code] = setInterval(this.inputEvents[code].fire, this.inputRate);
-    } else if (event.type === "keyup" && this.inputIntervals[code]) {
-      clearInterval(this.inputIntervals[code]);
-      this.inputIntervals[code] = undefined;
+  handleKey = (event: KeyboardEvent, code: keyof typeof this.events) => {
+    if (event.type === "keydown" && !this.intervals[code]) {
+      this.events[code].fire();
+      this.intervals[code] = setInterval(this.events[code].fire, this.inputRate);
+    } else if (event.type === "keyup" && this.intervals[code]) {
+      clearInterval(this.intervals[code]);
+      this.intervals[code] = 0;
     }
   };
-
+  handleSingleKey = (event: KeyboardEvent, key: keyof typeof this.keys) => {
+    if (event.type === "keydown" && !this.keys[key]) {
+      this.keys[key] = true;
+      this.events[key].fire();
+    } else if (event.type === "keyup" && this.keys[key]) this.keys[key] = false;
+  };
   handleTouchStart = (event: TouchEvent) => {
     if (!event.touches) return;
     this.touchStart.x = event.touches[0].pageX;
@@ -80,32 +79,31 @@ export default class InputHandler {
     const deltaY = event.touches[0].pageY - this.touchDrag.y;
 
     if (Math.abs(deltaX) > 30) {
-      if (deltaX > 0) this.inputEvents.moveRight.fire();
-      else this.inputEvents.moveLeft.fire();
+      if (deltaX > 0) this.events.moveRight.fire();
+      else this.events.moveLeft.fire();
       this.touchDrag.x = event.touches[0].pageX;
     }
 
     if (Math.abs(deltaY) > 60) {
-      if (deltaY > 0 && !this.inputIntervals.moveDown)
-        this.inputIntervals.moveDown = setInterval(this.inputEvents.moveDown.fire, this.inputRate);
-      else if (deltaY < 0 && this.inputIntervals.moveDown) {
-        clearInterval(this.inputIntervals.moveDown);
-        this.inputIntervals.moveDown = undefined;
+      if (deltaY > 0 && !this.intervals.moveDown)
+        this.intervals.moveDown = setInterval(this.events.moveDown.fire, this.inputRate);
+      else if (deltaY < 0 && this.intervals.moveDown) {
+        clearInterval(this.intervals.moveDown);
+        this.intervals.moveDown = 0;
       }
       this.touchDrag.y = event.touches[0].pageY;
     }
   };
-
   handleTouchEnd = (event: TouchEvent) => {
     if (!event.changedTouches) return;
     const deltaX = event.changedTouches[0].pageX - this.touchStart.x;
     const deltaY = event.changedTouches[0].pageY - this.touchStart.y;
     if (Math.hypot(deltaX, deltaY) < 5) {
       const touchRelativeToScrrenCenter = event.changedTouches[0].pageX - document.body.clientWidth * 0.5;
-      if (touchRelativeToScrrenCenter > 0) this.inputEvents.rotateRight.fire();
-      else this.inputEvents.rotateLeft.fire();
+      if (touchRelativeToScrrenCenter > 0) this.events.rotateRight.fire();
+      else this.events.rotateLeft.fire();
     }
-    clearInterval(this.inputIntervals.moveDown);
-    this.inputIntervals.moveDown = undefined;
+    clearInterval(this.intervals.moveDown);
+    this.intervals.moveDown = 0;
   };
 }
